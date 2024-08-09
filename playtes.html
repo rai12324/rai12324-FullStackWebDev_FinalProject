@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Basketball Guessing Game</title>
+    <style>
+        .correct-guess {
+            background-color: #00FF00; /* Green background for correct guesses */
+        }
+
+        .incorrect-guess {
+            background-color: #FF0000; /* Red background for incorrect guesses */
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Basketball Guessing Game!</h1>
+    <h2>Guess the NBA Player</h2>
+    <p>Enter the details of the player (Name, Team, Conference, Division, Position, Height, Jersey Number):</p>
+    <form method="POST">
+        <input type="text" name="guess" autocomplete="off" required>
+        <input type="hidden" name="attempts" value="{{ attempts }}">
+        <input type="submit" value="Submit">
+    </form>
+    <p>Attempts Remaining: {{ attempts }}</p> <!-- Display the attempt counter -->
+    <p>Previous Guesses:</p>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Team</th>
+            <th>Conference</th>
+            <th>Division</th>
+            <th>Position</th>
+            <th>Height</th>
+            <th>Jersey Number</th>
+        </tr>
+        {% for guess_data in guess_history %}
+        <tr>
+            {% for status, value in guess_data.feedback %}
+                <td class="{% if status == 'correct' %}correct-guess{% else %}incorrect-guess{% endif %}">{{ value }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+    {% if correct and not game_over %}
+    <p>Congratulations! You guessed the player correctly: {{ secret_word }}</p>
+    {% elif not correct and game_over % }
+    <p>Sorry, you've run out of attempts. The correct player was: {{ secret_word }}</p>
+    {% endif %}
+
+    <p>{{ feedback }}</p>
+</body>
+</html>

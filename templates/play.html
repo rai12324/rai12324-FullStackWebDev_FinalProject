@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Basketball Guessing Game</title>
+    <style>
+        body {
+            background-color: #222;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 50px;
+        }
+
+        p {
+            margin: 20px 0;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+            background-color: #333;
+            color: #fff;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #555;
+        }
+
+        th {
+            background-color: #444;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: rgba(0,0,0,0.4);
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 60%;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover, .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .correct-guess {
+            background-color: #6ca965; /* Green background for correct guesses */
+        }
+
+        .incorrect-guess {
+            background-color: #787c7f; /* Red background for incorrect guesses */
+        }
+
+        .closeh-guess {
+            background-color: #c5c506; /* Yellow background for close high guesses */
+        }
+
+        .closel-guess {
+            background-color: #fe00cf; /* Pink background for close low guesses */
+        }     
+        
+        #logoutForm {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999; /* Ensure it appears above other elements */
+        }
+    </style>
+    <script>
+        function openColorExplanation() {
+            // Get the modal
+            var modal = document.getElementById("colorExplanationModal");
+
+            // Display the modal
+            modal.style.display = "block";
+
+            // When the user clicks on <span> (x), close the modal
+            var closeBtn = document.getElementById("closeBtn");
+            closeBtn.onclick = function() {
+                modal.style.display = "none";
+            }
+        }
+
+        function openHowToPlay() {
+            // Get the modal
+            var modal = document.getElementById("howToPlayModal");
+
+            // Display the modal
+            modal.style.display = "block";
+
+            // When the user clicks on <span> (x), close the modal
+            var closeBtn = document.getElementById("howToPlayCloseBtn");
+            closeBtn.onclick = function() {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</head>
+<body>
+<!-- Display flashed messages -->
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+<h1>Welcome to the Basketball Guessing Game!</h1>
+<h2>Guess the NBA Player</h2>
+<p>Enter a current NBA Player's name:</p>
+<form method="POST">
+    <input type="text" name="guess" autocomplete="off" required>
+    <input type="hidden" name="attempts" value="{{ attempts }}">
+    <input type="submit" value="Submit">
+</form>
+<p>Attempts Remaining: {{ attempts }}</p> <!-- Display the attempt counter -->
+<p>Previous Guesses:</p>
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Team</th>
+        <th>Conference</th>
+        <th>Division</th>
+        <th>Position</th>
+        <th>Height</th>
+        <th>Jersey Number</th>
+    </tr>
+    {% for guess_data in guess_history %}
+    <tr>
+        {% for status, value in guess_data.feedback %}
+            <td class="{% if status == 'correct' %}correct-guess{% elif status == 'closeh' %}closeh-guess{% elif status == 'closel' %}closel-guess{% else %}incorrect-guess{% endif %}">{{ value }}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+<p>{{ feedback }}</p>
+
+<form action="{{ url_for('reset_game') }}" method="POST">
+    <input type="submit" value="Reset Game">
+</form>
+
+<!-- Add some spacing -->
+<div style="margin-top: 20px;"></div>
+
+<!-- Add a button to navigate to the leaderboard -->
+<form action="{{ url_for('leaderboard') }}">
+    <input type="submit" value="Leaderboard">
+</form>
+
+<button onclick="openHowToPlay()" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">How to Play</button>
+<div id="howToPlayModal" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+        <span id="howToPlayCloseBtn" class="close">&times;</span>
+        <h2>How to Play</h2>
+        <!-- Add your instructions here -->
+        <p>Welcome to Slamordle, a thrilling fusion of Wordle and basketball knowledge! Your mission is to figure out which NBA player is hiding behind the curtain by making a series of smart guesses. Each guess will give you important info about the player, like their team, conference, division, position, height, and jersey number. If any part of your guess matches the correct answer, that category will light up in green. Oh, and keep an eye out for hints: if your guess is within three units of the player's actual height or jersey number, the category will turn yellow, letting you know you're getting closer. Plus, if you see a yellow highlight for positions, it means the mystery player has at least one of the positions you guessed. And don't forget to pay attention to the arrows next to the height and jersey number: a downward arrow means the mystery player is shorter or has a lower jersey number, while an upward arrow suggests they're taller or have a higher jersey number. So, put your NBA expertise and detective skills to uncover the mystery player together!</p>
+    </div>
+</div>
+
+<button onclick="openColorExplanation()" style="position: fixed; top: 60px; right: 20px; z-index: 9999;">Color Explanation</button>
+<!-- The modal for color explanation -->
+<div id="colorExplanationModal" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+        <span id="closeBtn" class="close">&times;</span>
+        <h2>Color Explanation</h2>
+        <p><span class="correct-guess">Green:</span> Correct guess</p>
+        <p><span class="incorrect-guess">Gray:</span> Incorrect guess</p>
+        <p><span class="closeh-guess">Yellow:</span> Close guess within 3</p>
+    </div>
+</div>
+
+</body>
+</html>

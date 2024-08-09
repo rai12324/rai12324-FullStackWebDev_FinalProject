@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Play Again</title>
+    <style>
+        body {
+            background-color: #222;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        h2 {
+            margin-top: 50px;
+        }
+
+        p {
+            margin: 20px 0;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h2>Game Over</h2>
+    {% if correct %}
+        <p>Congratulations! You guessed the player correctly: {{ secret_word }}</p>
+    {% else %}
+        <p>Sorry, you've run out of attempts. The correct player was: {{ secret_word }}</p>
+    {% endif %}
+    <form action="{{ url_for('reset_game') }}" method="POST">
+        <input type="submit" value="Reset Game">
+    </form>
+</body>
+</html>

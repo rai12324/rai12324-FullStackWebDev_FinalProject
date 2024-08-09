@@ -1,0 +1,26 @@
+<!-- result.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game Over</title>
+</head>
+<body>
+    <h1>Game Over</h1>
+    {% if correct %}
+        <p>Congratulations! You guessed the NBA player correctly.</p>
+    {% else %}
+        <p>Oops! You couldn't guess the NBA player within the given attempts.</p>
+        <p>The correct NBA player was: {{ player_info.Name }}</p>
+    {% endif %}
+    <p>Player Information:</p>
+    <ul>
+        <li>Name: {{ player_info.Name }}</li>
+        <li>Team: {{ player_info.Team }}</li>
+        <li>Conference: {{ player_info.Conference }}</li>
+        <li>Division: {{ player_info.Division }}</li>
+        <li>Position: {{ player_info.Position }}</li>
+        <li>Height: {{ player_info.Height }}</li>
+        <li>Jersey Number: {{ player_info.Jersey Number }}</li>
+    </ul>
+</body>
+</html>
